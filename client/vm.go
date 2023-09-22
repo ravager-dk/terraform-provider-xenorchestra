@@ -130,6 +130,7 @@ type Vm struct {
 	ManagementAgentDetected        bool                `json:"managementAgentDetected"`
 	PVDriversDetected              bool                `json:"pvDriversDetected"`
 	DestroyCloudConfigVdiAfterBoot bool                `json:"-"`
+	XenstoreData                   map[string]string   `json:"XenstoreData"`
 }
 
 type Installation struct {

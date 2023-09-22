@@ -371,6 +371,12 @@ $ xo-cli xo.getAllObjects filter='json:{"id": "cf7b5d7d-3cd5-6b7c-5025-5c935c8cd
 				},
 			},
 		},
+		"XenstoreData": &schema.Schema{
+			Type:     schema.TypeMap,
+			Optional: true,
+			Default:  nil,
+			Computed: true,
+		},
 		"tags": resourceTags(),
 	}
 }
@@ -506,7 +512,8 @@ func resourceVmCreate(d *schema.ResourceData, m interface{}) error {
 		Videoram: client.Videoram{
 			Value: d.Get("videoram").(int),
 		},
-		Vga: d.Get("vga").(string),
+		Vga:          d.Get("vga").(string),
+		XenstoreData: d.Get("XenstoreData").(map[string]string),
 	}
 
 	affinityHost := d.Get("affinity_host").(string)
@@ -674,6 +681,7 @@ func resourceVmUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(client.XOClient)
 
 	id := d.Id()
+	XenstoreData := d.Get("XenstoreData").(map[string]string)
 	nameLabel := d.Get("name_label").(string)
 	affinityHost := d.Get("affinity_host").(string)
 	nameDescription := d.Get("name_description").(string)
@@ -850,6 +858,7 @@ func resourceVmUpdate(d *schema.ResourceData, m interface{}) error {
 		ResourceSet:       rs,
 		AutoPoweron:       autoPowerOn,
 		BlockedOperations: blockOperations,
+		XenstoreData:      XenstoreData,
 		ExpNestedHvm:      d.Get("exp_nested_hvm").(bool),
 		StartDelay:        d.Get("start_delay").(int),
 		Vga:               d.Get("vga").(string),
