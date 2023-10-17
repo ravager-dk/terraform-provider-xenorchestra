@@ -130,7 +130,7 @@ type Vm struct {
 	ManagementAgentDetected        bool                `json:"managementAgentDetected"`
 	PVDriversDetected              bool                `json:"pvDriversDetected"`
 	DestroyCloudConfigVdiAfterBoot bool                `json:"-"`
-	XenstoreData                   map[string]string   `json:"XenstoreData"`
+	XenstoreData                   map[string]string   `json:"xenstore_data,omitempty"`
 }
 
 type Installation struct {
@@ -232,6 +232,7 @@ func (c *Client) CreateVm(vmReq Vm, createTime time.Duration) (*Vm, error) {
 		"tags":              vmReq.Tags,
 		"auto_poweron":      vmReq.AutoPoweron,
 		"high_availability": vmReq.HA,
+		"XenstoreData":      vmReq.XenstoreData,
 	}
 
 	destroyCloudConfigVdiAfterBoot := vmReq.DestroyCloudConfigVdiAfterBoot
@@ -286,6 +287,11 @@ func (c *Client) CreateVm(vmReq Vm, createTime time.Duration) (*Vm, error) {
 		params["cloudConfig"] = cloudConfig
 	}
 
+	/* 	if len(vmReq.XenstoreData) > 0 {
+	   		XenstoreData := vmReq.XenstoreData
+	   		params["XenstoreData"] = XenstoreData
+	   	}
+	*/
 	resourceSet := vmReq.ResourceSet
 	if resourceSet != nil {
 		params["resourceSet"] = resourceSet

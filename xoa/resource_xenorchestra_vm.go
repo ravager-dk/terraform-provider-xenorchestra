@@ -371,7 +371,7 @@ $ xo-cli xo.getAllObjects filter='json:{"id": "cf7b5d7d-3cd5-6b7c-5025-5c935c8cd
 				},
 			},
 		},
-		"XenstoreData": &schema.Schema{
+		"xenstoredata": &schema.Schema{
 			Type:     schema.TypeMap,
 			Optional: true,
 			Default:  nil,
@@ -478,6 +478,14 @@ func resourceVmCreate(d *schema.ResourceData, m interface{}) error {
 			Id: rsId.(string),
 		}
 	}
+
+	xenstoredata_map := make(map[string]string)
+	if val, ok := d.Get("xenstoredata").(map[string]interface{}); ok {
+		for k, v := range val {
+			xenstoredata_map[k] = v.(string)
+		}
+	}
+
 	createVmParams := client.Vm{
 		BlockedOperations: blockedOperations,
 		Boot: client.Boot{
@@ -513,7 +521,7 @@ func resourceVmCreate(d *schema.ResourceData, m interface{}) error {
 			Value: d.Get("videoram").(int),
 		},
 		Vga:          d.Get("vga").(string),
-		XenstoreData: d.Get("XenstoreData").(map[string]string),
+		XenstoreData: xenstoredata_map,
 	}
 
 	affinityHost := d.Get("affinity_host").(string)
@@ -681,7 +689,7 @@ func resourceVmUpdate(d *schema.ResourceData, m interface{}) error {
 	c := m.(client.XOClient)
 
 	id := d.Id()
-	XenstoreData := d.Get("XenstoreData").(map[string]string)
+	xenstoredata := d.Get("xenstoredata").(map[string]string)
 	nameLabel := d.Get("name_label").(string)
 	affinityHost := d.Get("affinity_host").(string)
 	nameDescription := d.Get("name_description").(string)
@@ -858,7 +866,7 @@ func resourceVmUpdate(d *schema.ResourceData, m interface{}) error {
 		ResourceSet:       rs,
 		AutoPoweron:       autoPowerOn,
 		BlockedOperations: blockOperations,
-		XenstoreData:      XenstoreData,
+		XenstoreData:      xenstoredata,
 		ExpNestedHvm:      d.Get("exp_nested_hvm").(bool),
 		StartDelay:        d.Get("start_delay").(int),
 		Vga:               d.Get("vga").(string),
