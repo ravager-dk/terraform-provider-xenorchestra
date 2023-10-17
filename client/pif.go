@@ -7,28 +7,39 @@ import (
 )
 
 type PIF struct {
-	Device   string `json:"device"`
-	Host     string `json:"$host"`
-	Network  string `json:"$network"`
-	Id       string `json:"id"`
-	Uuid     string `json:"uuid"`
-	PoolId   string `json:"$poolId"`
-	Attached bool   `json:"attached"`
-	Vlan     int    `json:"vlan"`
+	Device       string `json:"device"`
+	Host         string `json:"$host"`
+	Network      string `json:"$network"`
+	Id           string `json:"id"`
+	Uuid         string `json:"uuid"`
+	PoolId       string `json:"$poolId"`
+	Attached     bool   `json:"attached"`
+	Vlan         int    `json:"vlan"`
+	IsBondMaster bool   `json:"isBondMaster,omitempty"`
+	IsBondSlave  bool   `json:"isBondSlave,omitempty"`
 }
 
 func (p PIF) Compare(obj interface{}) bool {
 	otherPif := obj.(PIF)
 
-	if p.Id != "" && otherPif.Id == p.Id {
-		return true
+	if p.Id != "" {
+		if otherPif.Id == p.Id {
+			return true
+		} else {
+			return false
+		}
 	}
 	hostIdExists := p.Host != ""
 	if hostIdExists && p.Host != otherPif.Host {
 		return false
 	}
 
-	if p.Vlan == otherPif.Vlan && p.Device == otherPif.Device {
+	networkIdExists := p.Network != ""
+	if networkIdExists && p.Network != otherPif.Network {
+		return false
+	}
+
+	if p.Vlan == otherPif.Vlan && (p.Device == "" || (p.Device == otherPif.Device)) {
 		return true
 	}
 	return false
