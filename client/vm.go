@@ -287,11 +287,10 @@ func (c *Client) CreateVm(vmReq Vm, createTime time.Duration) (*Vm, error) {
 		params["cloudConfig"] = cloudConfig
 	}
 
-	/* 	if len(vmReq.XenstoreData) > 0 {
-	   		XenstoreData := vmReq.XenstoreData
-	   		params["XenstoreData"] = XenstoreData
-	   	}
-	*/
+	if len(vmReq.XenstoreData) > 0 {
+		params["bootAfterCreate"] = false
+	}
+
 	resourceSet := vmReq.ResourceSet
 	if resourceSet != nil {
 		params["resourceSet"] = resourceSet
@@ -313,6 +312,24 @@ func (c *Client) CreateVm(vmReq Vm, createTime time.Duration) (*Vm, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	if len(vmReq.XenstoreData) > 0 {
+		Xenstoreparam := map[string]interface{}{
+			"XenstoreData": vmReq.XenstoreData,
+		}
+		err = c.Call("vm.set", Xenstoreparam, &vmId)
+
+		if err != nil {
+			return nil, err
+		}
+		time.Sleep(25 * time.Second) //Needs better detection of modification complete
+		if params["bootAfterCreate"].(bool) {
+			err = c.StartVm(vmId)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return c.GetVm(

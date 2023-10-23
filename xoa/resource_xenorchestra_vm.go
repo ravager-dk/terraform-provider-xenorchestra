@@ -1122,6 +1122,10 @@ func recordToData(resource client.Vm, vifs []client.VIF, disks []client.Disk, cd
 		}
 	}
 
+	if err := d.Set("xenstoredata", resource.XenstoreData); err != nil {
+		return err
+	}
+
 	return nil
 }
 
